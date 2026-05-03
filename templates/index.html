@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    .hero-banner {
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), 
+                    url('https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        margin-top: -16px;
+    }
+    .search-card {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 35px 30px;
+        border-radius: 12px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        border-top: 6px solid var(--irctc-orange);
+    }
+    .search-card h4 {
+        color: var(--irctc-blue);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .info-card {
+        transition: transform 0.3s ease;
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+    }
+    .info-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        border-bottom: 4px solid var(--irctc-orange);
+    }
+    .input-icon {
+        color: var(--irctc-blue);
+        width: 20px;
+        text-align: center;
+    }
+</style>
+
+<!-- Hero Section with Background Image -->
+<div class="hero-banner">
+    <div class="container">
+        <div class="row align-items-center">
+            
+            <!-- Left Side: IRCTC Search Card -->
+            <div class="col-lg-5 col-md-6 mb-5 mb-md-0">
+                <div class="search-card text-dark">
+                    <h4 class="mb-4 text-center">
+                        <i class="fas fa-paper-plane" style="color: var(--irctc-orange);"></i> BOOK TICKET
+                    </h4>
+                    
+                    <form method="POST" action="/search_train">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary"><i class="fas fa-map-marker-alt input-icon"></i> From</label>
+                            <input type="text" name="source" class="form-control form-control-lg bg-light" placeholder="Enter Source City" required>
+                        </div>
+                        
+                        <div class="text-center my-2">
+                            <i class="fas fa-exchange-alt text-muted"></i>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary"><i class="fas fa-map-pin input-icon"></i> To</label>
+                            <input type="text" name="destination" class="form-control form-control-lg bg-light" placeholder="Enter Destination City" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-secondary"><i class="far fa-calendar-alt input-icon"></i> Journey Date</label>
+                            <!-- NOTE: Added name="journey_date" here -->
+                            <input type="date" name="journey_date" class="form-control form-control-lg bg-light" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-custom btn-lg w-100 py-3">Search Trains <i class="fas fa-arrow-right ms-2"></i></button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Side: Big Text -->
+            <div class="col-lg-7 col-md-6 text-center text-md-end text-white px-4">
+                <h1 class="display-3 fw-bold mb-3" style="text-shadow: 2px 4px 6px rgba(0,0,0,0.8);">INDIAN RAILWAYS</h1>
+                <h3 class="fw-light mb-4" style="text-shadow: 1px 2px 4px rgba(0,0,0,0.8);">Safety | Security | Punctuality</h3>
+                <p class="lead" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">Experience the magic of train travel across the breathtaking landscapes of India.</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Info Cards Section -->
+<div class="container my-5">
+    <h3 class="text-center fw-bold mb-4" style="color: var(--irctc-blue);">Have you not found the right one?</h3>
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="card info-card shadow-sm py-4 h-100">
+                <div class="card-body">
+                    <i class="fas fa-ticket-alt fa-3x mb-3" style="color: var(--irctc-orange);"></i>
+                    <h5 class="fw-bold">Easy Booking</h5>
+                    <p class="text-muted">Book train tickets effortlessly from the comfort of your home with zero hassle.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card info-card shadow-sm py-4 h-100">
+                <div class="card-body">
+                    <i class="fas fa-utensils fa-3x mb-3" style="color: var(--irctc-blue);"></i>
+                    <h5 class="fw-bold">E-Catering</h5>
+                    <p class="text-muted">Order fresh, delicious food online directly to your train seat from top restaurants.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card info-card shadow-sm py-4 h-100">
+                <div class="card-body">
+                    <i class="fas fa-hotel fa-3x mb-3" style="color: var(--irctc-orange);"></i>
+                    <h5 class="fw-bold">Retiring Rooms</h5>
+                    <p class="text-muted">Book exclusive AC and Non-AC retiring rooms at major railway stations easily.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

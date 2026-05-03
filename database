@@ -1,0 +1,86 @@
+CREATE DATABASE IF NOT EXISTS railway_db;
+USE railway_db;
+
+-- Table: Train
+CREATE TABLE Train (
+    Train_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Train_Name VARCHAR(100) NOT NULL,
+    Source VARCHAR(50) NOT NULL,
+    Destination VARCHAR(50) NOT NULL,
+    Total_Seats INT NOT NULL
+);
+
+-- Table: Passenger
+CREATE TABLE Passenger (
+    Passenger_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Age INT NOT NULL,
+    Gender VARCHAR(10) NOT NULL,
+    Phone_No VARCHAR(15) NOT NULL,
+    Address TEXT
+);
+
+-- Table: Ticket
+CREATE TABLE Ticket (
+    Ticket_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Passenger_ID INT,
+    Train_ID INT,
+    Journey_Date DATE NOT NULL,
+    Seat_No INT NOT NULL,
+    Status VARCHAR(20) DEFAULT 'Booked',
+    FOREIGN KEY (Passenger_ID) REFERENCES Passenger(Passenger_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Train_ID) REFERENCES Train(Train_ID) ON DELETE CASCADE
+);
+
+-- Table: Station
+CREATE TABLE Station (
+    Station_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Station_Name VARCHAR(100) NOT NULL,
+    City VARCHAR(50),
+    State VARCHAR(50)
+);
+
+-- Table: Schedule
+CREATE TABLE Schedule (
+    Schedule_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Train_ID INT,
+    Station_ID INT,
+    Arrival_Time TIME,
+    Departure_Time TIME,
+    FOREIGN KEY (Train_ID) REFERENCES Train(Train_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Station_ID) REFERENCES Station(Station_ID) ON DELETE CASCADE
+);
+
+-- Table: Reservation
+CREATE TABLE Reservation (
+    Reservation_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Ticket_ID INT,
+    Coach_No VARCHAR(10),
+    Seat_Type VARCHAR(20),
+    Booking_Status VARCHAR(20) DEFAULT 'Confirmed',
+    FOREIGN KEY (Ticket_ID) REFERENCES Ticket(Ticket_ID) ON DELETE CASCADE
+);
+
+-- Table: Payment
+CREATE TABLE Payment (
+    Payment_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Ticket_ID INT,
+    Amount DECIMAL(10, 2) NOT NULL,
+    Payment_Mode VARCHAR(50),
+    Payment_Date DATE NOT NULL,
+    FOREIGN KEY (Ticket_ID) REFERENCES Ticket(Ticket_ID) ON DELETE CASCADE
+);
+
+-- Insert Sample Data for Testing
+INSERT INTO Train (Train_Name, Source, Destination, Total_Seats) VALUES 
+('Express 101', 'New York', 'Boston', 200),
+('Rajdhani Express', 'Delhi', 'Mumbai', 300),
+('Shatabdi Fast', 'Chennai', 'Bangalore', 150);
+
+INSERT INTO Station (Station_Name, City, State) VALUES 
+('NY Central', 'New York', 'NY'),
+('Boston South', 'Boston', 'MA'),
+('NDLS', 'Delhi', 'Delhi');
+
+INSERT INTO Passenger (Name, Age, Gender, Phone_No, Address) VALUES 
+('John Doe', 28, 'Male', '1234567890', '123 Main St, NY');

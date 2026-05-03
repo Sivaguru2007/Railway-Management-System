@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    /* Specific IRCTC Search UI Styles */
+    .search-top-bar {
+        background-color: var(--irctc-blue);
+        color: white;
+        padding: 15px 0;
+    }
+    .filter-sidebar {
+        border: 1px solid #ddd;
+        background: white;
+    }
+    .filter-header {
+        background: #f8f9fa;
+        padding: 10px 15px;
+        font-weight: bold;
+        border-bottom: 1px solid #ddd;
+        color: var(--irctc-blue);
+    }
+    .train-card {
+        border: 1px solid #ddd;
+        background: white;
+        margin-bottom: 20px;
+    }
+    .train-card-header {
+        background-color: #f8f9fa;
+        padding: 10px 15px;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .train-card-body {
+        padding: 20px;
+    }
+    .time-text {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    .station-text {
+        font-size: 0.9rem;
+        color: #555;
+    }
+    .duration-line {
+        text-align: center;
+        position: relative;
+        color: #777;
+        font-size: 0.85rem;
+    }
+    .duration-line::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        border-top: 1px dashed #ccc;
+        z-index: 1;
+    }
+    .duration-line span {
+        background: white;
+        padding: 0 10px;
+        position: relative;
+        z-index: 2;
+    }
+    .class-box {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        background: #fdfdfd;
+        width: 140px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .class-box:hover {
+        border-color: var(--irctc-orange);
+        box-shadow: 0 0 5px rgba(251, 121, 43, 0.4);
+    }
+    .class-name {
+        font-weight: bold;
+        color: var(--irctc-blue);
+        font-size: 0.9rem;
+    }
+    .availability {
+        color: #28a745;
+        font-weight: bold;
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+</style>
+
+<!-- Modify Search Bar (Top) -->
+<div class="search-top-bar">
+    <div class="container">
+        <form method="POST" action="/search_train" class="row g-2 align-items-center">
+            <div class="col-md-3">
+                <input type="text" name="source" class="form-control" value="{{ source }}" placeholder="From Station" required>
+            </div>
+            <div class="col-auto text-center"><i class="fas fa-exchange-alt"></i></div>
+            <div class="col-md-3">
+                <input type="text" name="destination" class="form-control" value="{{ destination }}" placeholder="To Station" required>
+            </div>
+            <div class="col-md-3">
+                <input type="date" name="journey_date" class="form-control" value="{{ journey_date }}" required>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-custom w-100">Modify Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container my-4">
+    <div class="row">
+        
+        <!-- Left Sidebar (Filters) -->
+        <div class="col-md-3 d-none d-md-block">
+            <div class="filter-sidebar mb-3">
+                <div class="filter-header d-flex justify-content-between">
+                    <span>Refine Results</span>
+                    <a href="#" class="text-decoration-none text-danger" style="font-size: 0.8rem;">Reset Filters</a>
+                </div>
+                
+                <div class="filter-header mt-2 bg-white border-0">JOURNEY CLASS</div>
+                <div class="px-3 pb-3 border-bottom">
+                    <div class="form-check"><input class="form-check-input" type="checkbox" checked> <label class="form-check-label">AC 2 Tier (2A)</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" checked> <label class="form-check-label">AC 3 Tier (3A)</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" checked> <label class="form-check-label">Sleeper (SL)</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" checked> <label class="form-check-label">AC Chair car (CC)</label></div>
+                </div>
+
+                <div class="filter-header mt-2 bg-white border-0">TRAIN TYPE</div>
+                <div class="px-3 pb-3">
+                    <div class="form-check"><input class="form-check-input" type="checkbox" checked> <label class="form-check-label">RAJHDHANI</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" checked> <label class="form-check-label">SHATABDI</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" checked> <label class="form-check-label">SPECIAL</label></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side (Train Results) -->
+        <div class="col-md-9">
+            
+            {% if trains %}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">{{ trains|length }} Results for <strong>{{ source|upper }} <i class="fas fa-arrow-right"></i> {{ destination|upper }}</strong> | {{ journey_date }}</h6>
+            </div>
+
+            {% for train in trains %}
+            <div class="train-card shadow-sm">
+                
+                <!-- Card Header -->
+                <div class="train-card-header">
+                    <h5 class="mb-0 fw-bold" style="color: var(--irctc-blue);">{{ train.Train_Name }}</h5>
+                    <span class="text-muted" style="font-size: 0.9rem;">Runs On: M T W T F S S</span>
+                </div>
+
+                <!-- Card Body (Timings) -->
+                <div class="train-card-body">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-4 text-end">
+                            <span class="time-text">{{ train.Dep_Time }}</span> | <span class="station-text">{{ train.Source|upper }}</span><br>
+                            <small class="text-muted">{{ journey_date }}</small>
+                        </div>
+                        <div class="col-4 duration-line">
+                            <span>{{ train.Duration }}</span>
+                        </div>
+                        <div class="col-4 text-start">
+                            <span class="time-text">{{ train.Arr_Time }}</span> | <span class="station-text">{{ train.Destination|upper }}</span><br>
+                            <small class="text-muted">Day 1</small>
+                        </div>
+                    </div>
+
+                    <!-- Journey Classes Boxes -->
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        <div class="class-box text-center">
+                            <div class="class-name">Sleeper (SL)</div>
+                            <div class="availability">AVAILABLE - 0124</div>
+                        </div>
+                        <div class="class-box text-center">
+                            <div class="class-name">AC 3 Tier (3A)</div>
+                            <div class="availability">AVAILABLE - 0056</div>
+                        </div>
+                        <div class="class-box text-center">
+                            <div class="class-name">AC 2 Tier (2A)</div>
+                            <div class="availability text-warning">RAC - 12</div>
+                        </div>
+                    </div>
+
+                    <!-- Book Button Footer -->
+                    <div class="d-flex align-items-center mt-3">
+                        <a href="/book_ticket?train_id={{ train.Train_ID }}&date={{ journey_date }}" class="btn btn-custom px-4 me-3">Book Now</a>
+                        <button class="btn btn-outline-secondary">OTHER DATES</button>
+                        <small class="text-danger ms-auto fw-bold"><i class="fas fa-bolt"></i> Fast Booking Available!</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% else %}
+            <!-- What to show if no search is done or no trains found -->
+            <div class="text-center py-5 bg-white border mt-4 shadow-sm">
+                <i class="fas fa-train fa-4x text-muted opacity-50 mb-3"></i>
+                <h4 class="text-muted">Search for a train to view schedules and availability</h4>
+                <p class="text-muted">Use the search bar above. Try <strong>Delhi</strong> to <strong>Mumbai</strong>.</p>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

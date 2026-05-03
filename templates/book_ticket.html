@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-5">
+    <div class="card mx-auto shadow-lg" style="max-width: 800px; border: none; border-top: 5px solid var(--irctc-orange);">
+        <div class="card-header bg-white text-dark text-center py-3">
+            <h3 class="mb-0" style="color: var(--irctc-blue); font-weight: 800;"><i class="fas fa-ticket-alt"></i> PASSENGER & BOOKING DETAILS</h3>
+        </div>
+        <div class="card-body p-4 bg-light">
+            <!-- Added ID to form for JavaScript control -->
+            <form id="bookingForm" method="POST" action="/book_ticket">
+                
+                <!-- Train Selection -->
+                <h5 class="fw-bold mb-3 border-bottom pb-2 text-secondary">1. Train Details</h5>
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Select Train</label>
+                        <select name="train_id" class="form-select" required>
+                            <option value="">-- Choose a Train --</option>
+                            {% for t in trains %}
+                            <option value="{{ t.Train_ID }}" {% if t.Train_ID == selected_train_id %}selected{% endif %}>
+                                {{ t.Train_Name }} ({{ t.Source }} to {{ t.Destination }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Journey Date</label>
+                        <input type="date" name="journey_date" value="{{ selected_date }}" class="form-control" required>
+                    </div>
+                </div>
+
+                <!-- Passenger Details -->
+                <h5 class="fw-bold mb-3 border-bottom pb-2 text-secondary">2. Passenger Details</h5>
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Passenger Name</label>
+                        <input type="text" name="p_name" class="form-control" placeholder="Enter full name" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold">Age</label>
+                        <input type="number" name="p_age" class="form-control" placeholder="Age" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold">Gender</label>
+                        <select name="p_gender" class="form-select" required>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Mobile Number</label>
+                        <input type="text" name="p_phone" class="form-control" placeholder="10-digit number" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Class / Seat Type</label>
+                        <select name="seat_type" class="form-select" required>
+                            <option value="AC First Class (1A)">AC First Class (1A)</option>
+                            <option value="AC 2 Tier (2A)">AC 2 Tier (2A)</option>
+                            <option value="AC 3 Tier (3A)">AC 3 Tier (3A)</option>
+                            <option value="Sleeper (SL)">Sleeper (SL)</option>
+                            <option value="AC Chair Car (CC)">AC Chair Car (CC)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Payment Details -->
+                <h5 class="fw-bold mb-3 border-bottom pb-2 text-secondary">3. Payment</h5>
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Ticket Fare (₹)</label>
+                        <input type="number" id="ticketAmount" name="amount" class="form-control" placeholder="e.g. 1500" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Payment Mode</label>
+                        <select id="paymentMode" name="payment_mode" class="form-select" required>
+                            <option value="UPI / BHIM">UPI / BHIM (QR Scan)</option>
+                            <option value="Credit/Debit Card">Credit/Debit Card</option>
+                            <option value="Net Banking">Net Banking</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Changed from type="submit" to type="button" to trigger JS modal -->
+                <button type="button" id="initiatePayBtn" class="btn btn-custom btn-lg w-100 py-3 mt-2">
+                    <i class="fas fa-lock"></i> Proceed to Payment
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAYMENT GATEWAY MODAL (POPUP) -->
+<!-- ========================================== -->
+<div class="modal fade" id="paymentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            
+            <div class="modal-header text-white" style="background-color: var(--irctc-blue);">
+                <h5 class="modal-title fw-bold"><i class="fas fa-shield-alt"></i> IRCTC Secure Payment Gateway</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body text-center py-4">
+                <h4 class="mb-3 text-secondary">Total Amount: <span class="text-success fw-bold" id="displayAmount">₹0</span></h4>
+                
+                <!-- Dynamic Content based on Payment Method -->
+                <div id="qrPaymentSection">
+                    <p class="text-muted small mb-2">Scan the QR code below using Google Pay, PhonePe, or Paytm.</p>
+                    <div class="p-2 border rounded d-inline-block bg-white shadow-sm mb-3">
+                        <!-- Generates a live dummy QR code using an API -->
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=IRCTC_DUMMY_PAYMENT" alt="QR Code">
+                    </div>
+                </div>
+
+                <div id="cardPaymentSection" style="display: none;">
+                    <p class="text-muted small mb-3">Please do not refresh the page while transaction is processing.</p>
+                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 fw-bold text-primary">Awaiting Bank Approval...</p>
+                </div>
+
+                <!-- Simulating a successful payment button -->
+                <button type="button" id="confirmPaymentBtn" class="btn btn-success btn-lg w-100 mt-2 rounded-pill fw-bold shadow">
+                    <i class="fas fa-check-circle"></i> Click here after scanning/paying
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript to control the form and popup -->
+<script>
+    document.getElementById('initiatePayBtn').addEventListener('click', function() {
+        // 1. Check if the form is completely filled
+        const form = document.getElementById('bookingForm');
+        if (!form.checkValidity()) {
+            form.reportValidity(); // Show default HTML5 error messages (e.g. "Please fill out this field")
+            return;
+        }
+
+        // 2. Get the Amount and Payment Mode from the form
+        const amount = document.getElementById('ticketAmount').value;
+        const mode = document.getElementById('paymentMode').value;
+
+        // 3. Update the Modal text
+        document.getElementById('displayAmount').innerText = '₹' + amount;
+
+        // 4. Show QR code OR Spinner depending on payment mode
+        if (mode === 'UPI / BHIM') {
+            document.getElementById('qrPaymentSection').style.display = 'block';
+            document.getElementById('cardPaymentSection').style.display = 'none';
+        } else {
+            document.getElementById('qrPaymentSection').style.display = 'none';
+            document.getElementById('cardPaymentSection').style.display = 'block';
+        }
+
+        // 5. Open the Bootstrap Modal
+        var myModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+        myModal.show();
+    });
+
+    // 6. When the user clicks "Click here after paying" in the modal
+    document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
+        
+        // Change button to show processing
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Payment...';
+        this.classList.remove('btn-success');
+        this.classList.add('btn-warning');
+        this.disabled = true;
+
+        // Wait 2 seconds (simulating bank connection), then submit the real form to the database
+        setTimeout(() => {
+            document.getElementById('bookingForm').submit();
+        }, 2000);
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card mx-auto shadow" style="max-width: 600px;">
+    <div class="card-header bg-primary text-white">
+        <h4>Add New Passenger</h4>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="/add_passenger">
+            <div class="mb-3">
+                <label>Full Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Age</label>
+                <input type="number" name="age" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Gender</label>
+                <select name="gender" class="form-select" required>
+                    <option value="">Select...</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label>Phone Number</label>
+                <input type="text" name="phone" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Address</label>
+                <textarea name="address" class="form-control" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Register Passenger</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

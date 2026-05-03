@@ -1,0 +1,86 @@
+/* IRCTC Theme Colors */
+:root {
+    --irctc-blue: #213d77;
+    --irctc-orange: #fb792b;
+    --irctc-orange-hover: #e06012;
+    --bg-light: #2f57d0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: var(--irctc-blue) !important;
+    padding: 15px 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+}
+.nav-link {
+    color: white !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    margin: 0 8px;
+    transition: 0.3s;
+}
+.nav-link:hover {
+    color: var(--irctc-orange) !important;
+}
+
+/* Custom Orange Button */
+.btn-custom {
+    background-color: var(--irctc-orange);
+    color: white;
+    font-weight: bold;
+    border: none;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+.btn-custom:hover {
+    background-color: var(--irctc-orange-hover);
+    color: white;
+}
+
+/* Homepage Hero Banner (Train Image Background) */
+.hero-banner {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                url('https://images.unsplash.com/photo-1474487548417-781cb71495f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
+    padding: 60px 0;
+    margin-top: -24px;
+    margin-bottom: 30px;
+}
+
+/* IRCTC Style Search Box */
+.search-card {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    border-top: 5px solid var(--irctc-orange);
+}
+
+/* Table and Cards */
+.card-header {
+    background-color: var(--irctc-blue) !important;
+    color: white;
+}
+.table-dark {
+    background-color: var(--irctc-blue) !important;
+}
+
+/* Footer */
+footer {
+    background-color: #f8f9fa;
+    border-top: 2px solid var(--irctc-orange);
+    margin-top: auto;
+}

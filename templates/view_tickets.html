@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3 class="mb-4">Manage Booked Tickets</h3>
+<table class="table table-hover table-bordered shadow-sm bg-white">
+    <thead class="table-dark">
+        <tr>
+            <th>Ticket ID</th>
+            <th>Passenger</th>
+            <th>Train</th>
+            <th>Date</th>
+            <th>Seat/Coach</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ticket in tickets %}
+        <tr>
+            <td>#{{ ticket.Ticket_ID }}</td>
+            <td>{{ ticket.Name }}</td>
+            <td>{{ ticket.Train_Name }}</td>
+            <td>{{ ticket.Journey_Date }}</td>
+            <td>{{ ticket.Seat_Type }} ({{ ticket.Coach_No }} - {{ ticket.Seat_No }})</td>
+            <td>${{ ticket.Amount }}</td>
+            <td>
+                {% if ticket.Status == 'Booked' %}
+                    <span class="badge bg-success">Booked</span>
+                {% else %}
+                    <span class="badge bg-danger">Cancelled</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if ticket.Status == 'Booked' %}
+                    <a href="/cancel_ticket/{{ ticket.Ticket_ID }}" class="btn btn-sm btn-warning" onclick="return confirm('Are you sure you want to cancel this ticket?');">Cancel</a>
+                {% else %}
+                    <a href="/delete_ticket/{{ ticket.Ticket_ID }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this record permanently?');">Delete</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        {% if not tickets %}
+        <tr>
+            <td colspan="8" class="text-center">No tickets found. <a href="/book_ticket">Book one now.</a></td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endblock %}
